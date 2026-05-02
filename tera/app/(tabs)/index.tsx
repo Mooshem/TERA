@@ -6,6 +6,9 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { auth } from "../../src/firebase.js";
+
+//console.log("Firebase ready:", auth);
 
 export default function HomeScreen() {
   return (
