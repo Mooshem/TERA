@@ -23,7 +23,7 @@ cd tera
 
 ## 2. Install dependencies
 ```bash
-npm install
+npm expo install
 npm install firebase
 ```
 
