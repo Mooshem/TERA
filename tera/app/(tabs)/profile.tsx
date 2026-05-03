@@ -1,72 +1,59 @@
 import { View, Text } from "react-native";
 import { useUserProfile } from "../../src/hooks/useUserProfile";
+import { calculateLevel, levelProgress } from "../../src/utils/levelSystem";
 
 export default function Profile() {
-  const { profile, loading } = useUserProfile();
+  const { profile } = useUserProfile();
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  if (!profile) return <Text>Loading...</Text>;
 
-  if (!profile) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>No profile found</Text>
-      </View>
-    );
-  }
+  const level = calculateLevel(profile.points || 0);
+  const progress = levelProgress(profile.points || 0);
 
   return (
     <View style={{ padding: 20, gap: 12 }}>
-      {/* Header */}
-      <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+      {/* USER */}
+      <Text style={{ fontSize: 28, fontWeight: "bold" }}>
         {profile.username}
       </Text>
 
-      <Text style={{ fontSize: 16, color: "gray" }}>
-        {profile.email}
+      {/* LEVEL */}
+      <Text style={{ fontSize: 18 }}>
+        Level {level}
       </Text>
 
-      {/* Stats Card */}
+      {/* PROGRESS BAR (simple) */}
       <View
         style={{
-          marginTop: 20,
-          padding: 15,
-          borderWidth: 1,
-          borderRadius: 10,
+          height: 10,
+          backgroundColor: "#ddd",
+          borderRadius: 5,
         }}
       >
-        <Text style={{ fontSize: 18 }}>
-          🌱 Points: {profile.points}
-        </Text>
-
-        <Text style={{ fontSize: 18, marginTop: 5 }}>
-          🏅 Badges: {profile.badges.length}
-        </Text>
+        <View
+          style={{
+            height: 10,
+            width: `${Math.max(0, Math.min(progress * 100, 100))}%`,
+            backgroundColor: "#2e7d32",
+            borderRadius: 5,
+          }}
+        />
       </View>
 
-      {/* Badges Section */}
-      <Text style={{ fontSize: 20, marginTop: 20 }}>
-        Achievements
+      {/* POINTS */}
+      <Text>🌱 Points: {profile.points}</Text>
+
+      {/* STREAK */}
+      <Text>🔥 Streak: {profile.streak?.current || 0} days</Text>
+
+      {/* BADGES */}
+      <Text style={{ marginTop: 10, fontWeight: "bold" }}>
+        Badges
       </Text>
 
-      {profile.badges.length === 0 ? (
-        <Text style={{ color: "gray" }}>
-          No badges yet — start participating in cleanup events 🌍
-        </Text>
-      ) : (
-        profile.badges.map((b, i) => (
-          <Text key={i} style={{ fontSize: 16 }}>
-            {b === "beginner" && "🌱 Beginner Eco Warrior"}
-            {b === "active" && "🌍 Active Contributor"}
-            {b === "leader" && "🏆 Community Leader"}
-          </Text>
-        ))
-      )}
+      {(profile.badges || []).map((b: string) => (
+        <Text key={b}>🏅 {b}</Text>
+      ))}
     </View>
   );
 }
