@@ -42,7 +42,7 @@ export default function Create() {
       });
 
       alert("Event created!");
-      router.replace("/(tabs)/index");
+      router.replace("/(tabs)");
     } catch (e: any) {
       alert(e.message);
     }

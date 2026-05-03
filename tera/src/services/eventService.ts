@@ -51,9 +51,15 @@ export async function createEvent(event: any) {
     return;
   }
 
+  // Get user profile to store username
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+  const userData = userDoc.data();
+  const username = userData?.username || user.email?.split("@")[0] || "Unknown";
+
   await addDoc(collection(db, "events"), {
     ...event,
     createdBy: user.uid,
+    createdByUsername: username,
     attendees: [],
     completed: false,
     createdAt: new Date(),
