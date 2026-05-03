@@ -3,6 +3,7 @@ import { useLeaderboard } from "../../src/hooks/useLeaderboard";
 import { ui } from "@/src/ui/theme";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
+import { PixelIcon } from "@/src/ui/components/PixelIcon";
 
 export default function Leaderboard() {
   const { users, loading } = useLeaderboard();
@@ -28,7 +29,10 @@ export default function Leaderboard() {
   return (
     <View style={styles.container}>
       <PixelNatureBackdrop />
-      <Text style={styles.title}>🏆 TERA Leaderboard</Text>
+      <View style={styles.titleContainer}>
+        <PixelIcon type="star" size={28} color="#ffd700" />
+        <Text style={styles.title}> TERA Leaderboard</Text>
+      </View>
       <Text style={styles.subtitle}>Top eco champions this week</Text>
 
       <AppCard style={styles.summaryCard}>
@@ -68,9 +72,10 @@ export default function Leaderboard() {
               </View>
 
               {/* RIGHT SIDE */}
-              <Text style={styles.points}>
-                🌱 {item.points}
-              </Text>
+              <View style={styles.pointsContainer}>
+                <PixelIcon type="leaf" size={20} color="#7cb342" animated={true} />
+                <Text style={styles.points}> {item.points}</Text>
+              </View>
             </AppCard>
           );
         }}
@@ -100,6 +105,11 @@ const styles = StyleSheet.create({
     color: ui.colors.textMuted,
   },
 
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: ui.spacing.sm,
+  },
   title: {
     fontSize: 26,
     fontWeight: "bold",
@@ -152,6 +162,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
+  pointsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   points: {
     fontSize: 16,
     fontWeight: "600",

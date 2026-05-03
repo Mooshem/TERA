@@ -2,6 +2,11 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-nativ
 import { useState } from "react";
 import { useRouter, Redirect } from "expo-router";
 import { BackNavButton } from "@/src/ui/components/BackNavButton";
+import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
+import { AppCard } from "@/src/ui/components/AppCard";
+import { AppButton } from "@/src/ui/components/AppButton";
+import { PixelIcon } from "@/src/ui/components/PixelIcon";
+import { ui } from "@/src/ui/theme";
 
 import { useUserProfile } from "../src/hooks/useUserProfile";
 import { createEvent } from "../src/services/eventService";
@@ -44,88 +49,106 @@ export default function Create() {
   };
 
   return (
-    <View style={styles.container}>
-      <BackNavButton fallbackHref="/(tabs)/profile" />
-      <Text style={styles.header}>Create Event 🌍</Text>
+    <View style={styles.screen}>
+      <PixelNatureBackdrop />
+      <View style={styles.container}>
+        <BackNavButton fallbackHref="/(tabs)/profile" />
+        <View style={styles.header}>
+          <PixelIcon type="tree" size={32} color="#4a7c59" />
+          <Text style={styles.headerText}>Create Event</Text>
+        </View>
 
-      <TextInput
-        placeholder="Event Title"
-        value={title}
-        onChangeText={setTitle}
-        style={styles.input}
-      />
+        <AppCard style={styles.card}>
+          <TextInput
+            placeholder="Event Title"
+            value={title}
+            onChangeText={setTitle}
+            style={styles.input}
+            placeholderTextColor={ui.colors.textMuted}
+          />
 
-      <TextInput
-        placeholder="Location"
-        value={location}
-        onChangeText={setLocation}
-        style={styles.input}
-      />
+          <TextInput
+            placeholder="Location"
+            value={location}
+            onChangeText={setLocation}
+            style={styles.input}
+            placeholderTextColor={ui.colors.textMuted}
+          />
 
-      <TextInput
-        placeholder="Date (e.g. May 10, 3PM)"
-        value={date}
-        onChangeText={setDate}
-        style={styles.input}
-      />
+          <TextInput
+            placeholder="Date (e.g. May 10, 3PM)"
+            value={date}
+            onChangeText={setDate}
+            style={styles.input}
+            placeholderTextColor={ui.colors.textMuted}
+          />
 
-      <TextInput
-        placeholder="Points Reward"
-        value={points}
-        onChangeText={setPoints}
-        keyboardType="numeric"
-        style={styles.input}
-      />
+          <TextInput
+            placeholder="Points Reward"
+            value={points}
+            onChangeText={setPoints}
+            keyboardType="numeric"
+            style={styles.input}
+            placeholderTextColor={ui.colors.textMuted}
+          />
 
-      <TextInput
-        placeholder="Photo URL (optional)"
-        value={photoURL}
-        onChangeText={setPhotoURL}
-        style={styles.input}
-      />
+          <TextInput
+            placeholder="Photo URL (optional)"
+            value={photoURL}
+            onChangeText={setPhotoURL}
+            style={styles.input}
+            placeholderTextColor={ui.colors.textMuted}
+          />
+        </AppCard>
 
-      <TouchableOpacity style={styles.button} onPress={handleCreate}>
-        <Text style={styles.buttonText}>Create Event</Text>
-      </TouchableOpacity>
+        <AppButton 
+          label="Create Event" 
+          onPress={handleCreate}
+        />
+      </View>
     </View>
   );
 }
 
-const GREEN = "#2e7d32";
-
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: ui.colors.background,
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f4f7f4",
-    gap: 12,
+    padding: ui.spacing.xl,
+    gap: ui.spacing.lg,
   },
-
   header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: GREEN,
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "white",
-  },
-
-  button: {
-    backgroundColor: GREEN,
-    padding: 14,
-    borderRadius: 10,
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
+    gap: ui.spacing.md,
+    marginBottom: ui.spacing.lg,
   },
-
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
+  headerText: {
+    fontSize: ui.type.title,
+    fontWeight: "800",
+    color: ui.colors.primaryDark,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    textShadowColor: "#fff",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 0,
+  },
+  card: {
+    gap: ui.spacing.md,
+    paddingVertical: ui.spacing.lg,
+  },
+  input: {
+    borderWidth: 2,
+    borderColor: ui.colors.border,
+    padding: ui.spacing.md,
+    borderRadius: ui.radius.sm,
+    backgroundColor: ui.colors.surface,
+    fontSize: ui.type.body,
+    color: ui.colors.text,
+    fontWeight: "600",
+    marginBottom: ui.spacing.sm,
   },
 });

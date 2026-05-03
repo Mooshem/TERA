@@ -42,7 +42,7 @@ export default function HomeScreen() {
       <View style={styles.statRow}>
         <AppCard style={styles.statCard}>
           <View style={styles.statIcon}>
-            <PixelIcon type="leaf" size={32} color="#7cb342" />
+            <PixelIcon type="leaf" size={32} color="#7cb342" animated={true} />
           </View>
           <Text style={styles.statValue}>{points}</Text>
           <Text style={styles.statLabel}>Total points</Text>
@@ -59,7 +59,10 @@ export default function HomeScreen() {
       <AppCard style={styles.section}>
         <View style={styles.levelRow}>
           <Text style={styles.levelText}>Level {level}</Text>
-          <Text style={styles.streakChip}>🔥 {streak} day streak</Text>
+          <View style={styles.streakChip}>
+          <PixelIcon type="fire" size={16} color="#ff6b35" />
+          <Text style={styles.streakText}> {streak} day streak</Text>
+        </View>
         </View>
         <PixelProgressBar 
           progress={progress} 
@@ -169,12 +172,16 @@ const styles = StyleSheet.create({
   },
   streakChip: {
     backgroundColor: ui.colors.gold,
-    color: "#fff",
     paddingHorizontal: ui.spacing.sm,
     paddingVertical: ui.spacing.xs,
     borderRadius: ui.radius.sm,
     borderWidth: 2,
     borderColor: "#b8860b",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  streakText: {
+    color: "#fff",
     fontSize: 12,
     fontWeight: "800",
     textTransform: "uppercase",

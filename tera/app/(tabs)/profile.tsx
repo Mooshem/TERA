@@ -11,6 +11,7 @@ import { Href, useRouter } from "expo-router";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { CelebrationBurst } from "@/src/ui/components/CelebrationBurst";
 import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
+import { PixelIcon } from "@/src/ui/components/PixelIcon";
 import { ui } from "@/src/ui/theme";
 import { useUserProfile } from "../../src/hooks/useUserProfile";
 import { calculateLevel, levelProgress } from "../../src/utils/levelSystem";
@@ -99,6 +100,19 @@ export default function Profile() {
     playPulse();
   };
 
+  const handleAwardPoints = async (userId: string, points: number, username: string) => {
+    try {
+      await awardPoints(userId, points);
+      setBurstText(`Awarded ${points} points to ${username}!`);
+      setBurstCounter((prev) => prev + 1);
+      playPulse();
+    } catch (error) {
+      console.error("Error awarding points:", error);
+      setBurstText("Error awarding points!");
+      setBurstCounter((prev) => prev + 1);
+    }
+  };
+
   const handleCompleteEvent = async (eventId: string) => {
     await completeEvent(eventId);
     setBurstText("Event completed!");
@@ -125,9 +139,18 @@ export default function Profile() {
           <Text style={styles.kicker}>PLAYER PROFILE</Text>
           <Text style={styles.username}>{profile.username}</Text>
           <Animated.View style={[styles.metaChips, { transform: [{ scale: chipPulse }] }]}>
-            <Text style={styles.metaChip}>🌱 {points} XP</Text>
-            <Text style={styles.metaChip}>🔥 {profile?.streak?.current || 0} streak</Text>
-            <Text style={styles.metaChip}>⭐ Lv {level}</Text>
+            <View style={styles.metaChip}>
+              <PixelIcon type="leaf" size={16} color="#7cb342" animated={true} />
+              <Text style={styles.metaChipText}> {points} XP</Text>
+            </View>
+            <View style={styles.metaChip}>
+              <PixelIcon type="fire" size={16} color="#ff6b35" />
+              <Text style={styles.metaChipText}> {profile?.streak?.current || 0} streak</Text>
+            </View>
+            <View style={styles.metaChip}>
+              <PixelIcon type="star" size={16} color="#ffd700" />
+              <Text style={styles.metaChipText}> Lv {level}</Text>
+            </View>
           </Animated.View>
           <View style={styles.badgeRow}>
             {(profile.badges || []).length === 0 ? (
@@ -135,7 +158,10 @@ export default function Profile() {
             ) : (
               profile.badges.map((b: string) => (
                 <View key={b} style={styles.badge}>
-                  <Text style={styles.badgeText}>🏅 {b}</Text>
+                  <View style={styles.badgeContent}>
+                    <PixelIcon type="badge" size={12} color="#daa520" />
+                    <Text style={styles.badgeText}> {b}</Text>
+                  </View>
                 </View>
               ))
             )}
@@ -179,7 +205,10 @@ export default function Profile() {
               style={styles.createButton}
               onPress={() => router.push("/create" as Href)}
             >
-              <Text style={styles.createButtonText}>🌍 Create Cleanup Event</Text>
+              <View style={styles.createButtonContent}>
+                <PixelIcon type="globe" size={16} color="#4a7c59" />
+                <Text style={styles.createButtonText}> Create Cleanup Event</Text>
+              </View>
             </TouchableOpacity>
           </AppCard>
         )}
@@ -200,14 +229,20 @@ export default function Profile() {
                       <Text style={styles.attendeeName}>{user.username}</Text>
                       <View style={styles.buttonGroup}>
                         <TouchableOpacity
-                          style={styles.fullButton}
-                          onPress={() => awardPoints(user.userId, event.pointsReward)}
+                          style={({ pressed }) => [
+                            styles.fullButton,
+                            pressed && styles.fullButtonPressed
+                          ]}
+                          onPress={() => handleAwardPoints(user.userId, event.pointsReward, user.username)}
                         >
                           <Text style={styles.buttonText}>Full</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          style={styles.halfButton}
-                          onPress={() => awardPoints(user.userId, Math.floor(event.pointsReward / 2))}
+                          style={({ pressed }) => [
+                            styles.halfButton,
+                            pressed && styles.halfButtonPressed
+                          ]}
+                          onPress={() => handleAwardPoints(user.userId, Math.floor(event.pointsReward / 2), user.username)}
                         >
                           <Text style={styles.buttonText}>Half</Text>
                         </TouchableOpacity>
@@ -276,13 +311,17 @@ const styles = StyleSheet.create({
   },
   metaChip: {
     backgroundColor: "#e6f5e9",
-    color: ui.colors.primaryDark,
-    borderRadius: ui.radius.pill,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    fontSize: 12,
-    borderWidth: 1,
+    borderRadius: ui.radius.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 2,
     borderColor: "#c7dccb",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  metaChipText: {
+    color: ui.colors.primaryDark,
+    fontSize: 12,
     fontWeight: "700",
   },
   badgeRow: {
@@ -293,16 +332,20 @@ const styles = StyleSheet.create({
   },
   badge: {
     backgroundColor: LIGHT_GREEN,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: 2,
     borderColor: "#cfe5d0",
+  },
+  badgeContent: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   badgeText: {
     color: GREEN,
-    fontSize: 12,
-    fontWeight: "500",
+    fontSize: 11,
+    fontWeight: "600",
   },
   noBadges: {
     fontSize: 12,
@@ -375,6 +418,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
   },
+  createButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   createButtonText: {
     color: "white",
     fontWeight: "700",
@@ -415,12 +463,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#2d5a3d",
+  },
+  fullButtonPressed: {
+    backgroundColor: "#2d5a3d",
+    transform: [{ scale: 0.95 }],
   },
   halfButton: {
     backgroundColor: "#6cae70",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#5a8d5f",
+  },
+  halfButtonPressed: {
+    backgroundColor: "#5a8d5f",
+    transform: [{ scale: 0.95 }],
   },
   buttonText: {
     color: "white",
