@@ -7,6 +7,10 @@ export type UserProfile = {
   email: string;
   points: number;
   badges: string[];
+  verified: boolean;
+  streak: {
+    current: number;
+  };
   createdAt?: any;
 };
 
@@ -18,20 +22,42 @@ export function useUserProfile() {
     const user = auth.currentUser;
 
     if (!user) {
+      setProfile(null);
       setLoading(false);
       return;
     }
 
     const ref = doc(db, "users", user.uid);
 
-    const unsub = onSnapshot(ref, (snap) => {
-      if (snap.exists()) {
-        setProfile(snap.data() as UserProfile);
-      }
-      setLoading(false);
-    });
+    const unsub = onSnapshot(
+      ref,
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
 
-    return unsub;
+          setProfile({
+            username: data.username ?? "",
+            email: data.email ?? "",
+            points: data.points ?? 0,
+            badges: data.badges ?? [],
+            verified: data.verified ?? false,
+            streak: data.streak ?? { current: 0 },
+            createdAt: data.createdAt ?? null,
+          });
+        } else {
+          setProfile(null);
+        }
+
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching user profile:", error);
+        setProfile(null);
+        setLoading(false);
+      }
+    );
+
+    return () => unsub();
   }, []);
 
   return { profile, loading };
