@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { listenToEvents } from "../../src/services/eventService";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { AppButton } from "@/src/ui/components/AppButton";
+import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
 import { ui } from "@/src/ui/theme";
 import { StyleSheet } from "react-native";
 
@@ -31,6 +32,7 @@ export default function Explore() {
 
   return (
     <View style={styles.container}>
+      <PixelNatureBackdrop />
       <Text style={styles.header}>Discover Community Cleanups</Text>
       <Text style={styles.subheader}>Find events, earn points, and restore your local environment.</Text>
 
@@ -131,6 +133,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
     overflow: "hidden",
+    backgroundColor: "rgba(247,251,247,0.94)",
   },
   image: {
     height: 120,

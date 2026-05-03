@@ -2,6 +2,7 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useLeaderboard } from "../../src/hooks/useLeaderboard";
 import { ui } from "@/src/ui/theme";
 import { AppCard } from "@/src/ui/components/AppCard";
+import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
 
 export default function Leaderboard() {
   const { users, loading } = useLeaderboard();
@@ -9,6 +10,7 @@ export default function Leaderboard() {
   if (loading) {
     return (
       <View style={styles.center}>
+        <PixelNatureBackdrop />
         <Text style={styles.loading}>Loading leaderboard...</Text>
       </View>
     );
@@ -17,6 +19,7 @@ export default function Leaderboard() {
   if (users.length === 0) {
     return (
       <View style={styles.center}>
+        <PixelNatureBackdrop />
         <Text style={styles.loading}>No users yet</Text>
       </View>
     );
@@ -24,6 +27,7 @@ export default function Leaderboard() {
 
   return (
     <View style={styles.container}>
+      <PixelNatureBackdrop />
       <Text style={styles.title}>🏆 TERA Leaderboard</Text>
       <Text style={styles.subtitle}>Top eco champions this week</Text>
 

@@ -8,6 +8,7 @@ import { ui } from "@/src/ui/theme";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { AppButton } from "@/src/ui/components/AppButton";
 import { BackNavButton } from "@/src/ui/components/BackNavButton";
+import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
 
 export default function Signup() {
   const router = useRouter();
@@ -59,8 +60,7 @@ export default function Signup() {
 
   return (
     <View style={styles.screen}>
-      <View style={styles.orbLarge} />
-      <View style={styles.orbSmall} />
+      <PixelNatureBackdrop />
       <BackNavButton fallbackHref="/(auth)/login" label="Login" style={styles.backButton} />
 
       <View style={styles.brandWrap}>
@@ -128,24 +128,6 @@ const styles = StyleSheet.create({
     backgroundColor: ui.colors.background,
     gap: ui.spacing.md,
     overflow: "hidden",
-  },
-  orbLarge: {
-    position: "absolute",
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: ui.colors.sky,
-    top: -80,
-    left: -90,
-  },
-  orbSmall: {
-    position: "absolute",
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: ui.colors.primarySoft,
-    bottom: -40,
-    right: -40,
   },
   brandWrap: {
     alignItems: "center",

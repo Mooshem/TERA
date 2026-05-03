@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { AppButton } from "@/src/ui/components/AppButton";
+import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
 import { ui } from "@/src/ui/theme";
 import { calculateLevel, levelProgress } from "@/src/utils/levelSystem";
 
@@ -27,6 +28,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.screen}>
+      <PixelNatureBackdrop />
       <AppCard style={styles.hero}>
         <Text style={styles.eyebrow}>TERA DAILY IMPACT</Text>
         <Text style={styles.heroTitle}>Welcome back, {firstName}</Text>
@@ -136,6 +138,7 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: ui.spacing.sm,
+    backgroundColor: "rgba(247,251,247,0.94)",
   },
   levelRow: {
     flexDirection: "row",

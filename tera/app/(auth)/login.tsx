@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import { ui } from "@/src/ui/theme";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { AppButton } from "@/src/ui/components/AppButton";
+import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
 
 export default function Login() {
   const router = useRouter();
@@ -40,8 +41,7 @@ export default function Login() {
 
   return (
     <View style={styles.screen}>
-      <View style={styles.orbLarge} />
-      <View style={styles.orbSmall} />
+      <PixelNatureBackdrop />
 
       <View style={styles.brandWrap}>
         <Text style={styles.brand}>TERA</Text>
@@ -99,24 +99,6 @@ const styles = StyleSheet.create({
     backgroundColor: ui.colors.background,
     gap: ui.spacing.md,
     overflow: "hidden",
-  },
-  orbLarge: {
-    position: "absolute",
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: ui.colors.sky,
-    top: -80,
-    right: -90,
-  },
-  orbSmall: {
-    position: "absolute",
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: ui.colors.primarySoft,
-    bottom: -40,
-    left: -40,
   },
   brandWrap: {
     alignItems: "center",

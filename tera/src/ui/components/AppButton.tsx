@@ -32,6 +32,7 @@ export function AppButton({
             : styles.ghost,
         pressed && !disabled && styles.pressed,
         disabled && styles.disabled,
+        pressed && !disabled && { transform: [{ scale: 0.98 }] },
       ]}
     >
       <Text
