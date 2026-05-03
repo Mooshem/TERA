@@ -1,31 +1,76 @@
 import {
   collection,
+  addDoc,
   onSnapshot,
   doc,
-  updateDoc,
-  arrayUnion,
   getDoc,
+  updateDoc,
+  query,
+  where,
+  arrayUnion,
 } from "firebase/firestore";
+
 import { db, auth } from "../firebase";
 
 /* =========================
-   LISTEN TO EVENTS (FIX)
+   CREATE EVENT
 ========================= */
-export function listenToEvents(setEvents: (events: any[]) => void) {
-  const ref = collection(db, "events");
+export async function createEvent(event: any) {
+  const user = auth.currentUser;
 
-  return onSnapshot(ref, (snapshot) => {
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+  if (!user) {
+    console.log("No logged-in user");
+    return;
+  }
 
-    setEvents(data);
+  await addDoc(collection(db, "events"), {
+    ...event,
+    createdBy: user.uid,
+    attendees: [],
+    completed: false,
+    createdAt: new Date(),
   });
 }
 
 /* =========================
-   JOIN EVENT (YOUR CODE)
+   LISTEN TO ALL EVENTS
+========================= */
+export function listenToEvents(setEvents: (events: any[]) => void) {
+  const unsub = onSnapshot(collection(db, "events"), (snapshot) => {
+    const data = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      // hide completed events from explore
+      .filter((e: any) => !e.completed);
+
+    setEvents(data);
+  });
+
+  return unsub;
+}
+
+/* =========================
+   GET SINGLE EVENT (FIX)
+========================= */
+export async function getEventById(eventId: string) {
+  const ref = doc(db, "events", eventId);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    console.log("Event not found");
+    return null;
+  }
+
+  return {
+    id: snap.id,
+    ...snap.data(),
+  };
+}
+
+/* =========================
+   JOIN EVENT
 ========================= */
 export async function joinEvent(eventId: string) {
   const firebaseUser = auth.currentUser;
@@ -45,7 +90,7 @@ export async function joinEvent(eventId: string) {
 
   const userData = userSnap.data();
 
-  const user = {
+  const attendee = {
     userId: firebaseUser.uid,
     username: userData.username,
   };
@@ -53,16 +98,54 @@ export async function joinEvent(eventId: string) {
   const eventRef = doc(db, "events", eventId);
 
   await updateDoc(eventRef, {
-    attendees: arrayUnion(user),
+    attendees: arrayUnion(attendee),
   });
 }
 
 /* =========================
-   GET SINGLE EVENT (needed for detail page)
+   LISTEN TO MANAGED EVENTS
 ========================= */
-export async function getEventById(id: string) {
-  const ref = doc(db, "events", id);
+export function listenToManagedEvents(
+  userId: string,
+  setEvents: (events: any[]) => void
+) {
+  const q = query(collection(db, "events"), where("createdBy", "==", userId));
+
+  const unsub = onSnapshot(q, (snapshot) => {
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    setEvents(data);
+  });
+
+  return unsub;
+}
+
+/* =========================
+   COMPLETE EVENT
+========================= */
+export async function completeEvent(eventId: string) {
+  const ref = doc(db, "events", eventId);
+
+  await updateDoc(ref, {
+    completed: true,
+  });
+}
+
+/* =========================
+   AWARD POINTS
+========================= */
+export async function awardPoints(userId: string, points: number) {
+  const ref = doc(db, "users", userId);
   const snap = await getDoc(ref);
 
-  return { id: snap.id, ...snap.data() };
+  if (!snap.exists()) return;
+
+  const current = snap.data().points || 0;
+
+  await updateDoc(ref, {
+    points: current + points,
+  });
 }
