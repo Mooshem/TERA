@@ -12,11 +12,18 @@ export function AppCard({ children, style }: AppCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: ui.colors.surface,
-    borderRadius: ui.radius.lg,
-    borderWidth: 1,
-    borderColor: ui.colors.border,
+    backgroundColor: "#f8f8e8",
+    borderRadius: 2,
+    borderWidth: 3,
+    borderColor: "#8b7355",
+    borderTopColor: "#c4b5a0",
+    borderLeftColor: "#c4b5a0",
     padding: ui.spacing.lg,
-    ...ui.shadows.card,
+    position: "relative",
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 0,
+    shadowOffset: { width: 4, height: 4 },
+    elevation: 4,
   },
 });

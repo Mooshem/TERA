@@ -5,6 +5,8 @@ import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { AppButton } from "@/src/ui/components/AppButton";
 import { PixelNatureBackdrop } from "@/src/ui/components/PixelNatureBackdrop";
+import { PixelProgressBar } from "@/src/ui/components/PixelProgressBar";
+import { PixelIcon } from "@/src/ui/components/PixelIcon";
 import { ui } from "@/src/ui/theme";
 import { calculateLevel, levelProgress } from "@/src/utils/levelSystem";
 
@@ -39,11 +41,17 @@ export default function HomeScreen() {
 
       <View style={styles.statRow}>
         <AppCard style={styles.statCard}>
-          <Text style={styles.statValue}>🌱 {points}</Text>
+          <View style={styles.statIcon}>
+            <PixelIcon type="leaf" size={32} color="#7cb342" />
+          </View>
+          <Text style={styles.statValue}>{points}</Text>
           <Text style={styles.statLabel}>Total points</Text>
         </AppCard>
         <AppCard style={styles.statCard}>
-          <Text style={styles.statValue}>🏅 {profile?.badges?.length || 0}</Text>
+          <View style={styles.statIcon}>
+            <PixelIcon type="badge" size={32} color="#daa520" />
+          </View>
+          <Text style={styles.statValue}>{profile?.badges?.length || 0}</Text>
           <Text style={styles.statLabel}>Badges earned</Text>
         </AppCard>
       </View>
@@ -53,19 +61,12 @@ export default function HomeScreen() {
           <Text style={styles.levelText}>Level {level}</Text>
           <Text style={styles.streakChip}>🔥 {streak} day streak</Text>
         </View>
-        <View style={styles.progressTrack}>
-          <Animated.View
-            style={[
-              styles.progressFill,
-              {
-                width: progressAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ["0%", "100%"],
-                }),
-              },
-            ]}
-          />
-        </View>
+        <PixelProgressBar 
+          progress={progress} 
+          height={16}
+          color={ui.colors.primary}
+          backgroundColor={ui.colors.border}
+        />
         <Text style={styles.progressText}>{Math.round(progress * 100)}% to next level</Text>
 
         <Text style={styles.sectionTitle}>Today&apos;s Eco Mission</Text>
@@ -100,24 +101,29 @@ const styles = StyleSheet.create({
   },
   hero: {
     backgroundColor: ui.colors.primarySoft,
-    borderColor: ui.colors.accent,
+    borderColor: ui.colors.earth,
   },
   eyebrow: {
     color: ui.colors.primaryDark,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.1,
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.5,
     marginBottom: ui.spacing.xs,
+    textTransform: "uppercase",
   },
   heroTitle: {
-    fontSize: 26,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
     color: ui.colors.text,
     marginBottom: ui.spacing.xs,
+    textShadowColor: "#fff",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 0,
   },
   heroBody: {
     color: ui.colors.textMuted,
     fontSize: ui.type.body,
+    fontWeight: "500",
   },
   statRow: {
     flexDirection: "row",
@@ -126,39 +132,53 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     alignItems: "center",
+    paddingVertical: ui.spacing.lg,
+  },
+  statIcon: {
+    marginBottom: ui.spacing.sm,
   },
   statValue: {
-    fontSize: 26,
+    fontSize: 28,
     color: ui.colors.primaryDark,
-    fontWeight: "700",
+    fontWeight: "800",
+    marginBottom: ui.spacing.xs,
   },
   statLabel: {
     color: ui.colors.textMuted,
     fontSize: 13,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   section: {
     gap: ui.spacing.sm,
-    backgroundColor: "rgba(247,251,247,0.94)",
+    backgroundColor: ui.colors.surface,
   },
   levelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: ui.spacing.md,
   },
   levelText: {
     color: ui.colors.primaryDark,
-    fontWeight: "700",
+    fontWeight: "800",
+    fontSize: 20,
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
   streakChip: {
-    backgroundColor: "#fff2dc",
-    color: "#8a5a00",
+    backgroundColor: ui.colors.gold,
+    color: "#fff",
     paddingHorizontal: ui.spacing.sm,
     paddingVertical: ui.spacing.xs,
-    borderRadius: ui.radius.pill,
-    borderWidth: 1,
-    borderColor: "#f3d59a",
+    borderRadius: ui.radius.sm,
+    borderWidth: 2,
+    borderColor: "#b8860b",
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   progressTrack: {
     height: 10,
@@ -173,14 +193,22 @@ const styles = StyleSheet.create({
   progressText: {
     color: ui.colors.textMuted,
     fontSize: 12,
+    fontWeight: "600",
+    marginTop: ui.spacing.xs,
+    textAlign: "center",
   },
   sectionTitle: {
     fontSize: ui.type.section,
-    fontWeight: "700",
+    fontWeight: "800",
     color: ui.colors.primaryDark,
+    marginBottom: ui.spacing.xs,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   sectionBody: {
     color: ui.colors.textMuted,
     fontSize: ui.type.body,
+    marginBottom: ui.spacing.md,
+    fontWeight: "500",
   },
 });
