@@ -7,8 +7,9 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import { router } from "expo-router";
 
-import { listenToEvents, joinEvent } from "../../src/services/eventService";
+import { listenToEvents } from "../../src/services/eventService";
 
 export default function Explore() {
   const [events, setEvents] = useState<any[]>([]);
@@ -82,14 +83,17 @@ export default function Explore() {
               </Text>
 
               <Text>📍 {item.location}</Text>
-
               <Text>🌱 {item.pointsReward} pts</Text>
-
               <Text>👤 {item.createdByUsername}</Text>
 
-              {/* JOIN BUTTON */}
+              {/* RSVP COUNT */}
+              <Text>
+                👥 {item.attendees?.length || 0} going
+              </Text>
+
+              {/* NAVIGATE TO DETAIL */}
               <Pressable
-                onPress={() => joinEvent(item.id)}
+                onPress={() => router.push(`/event/${item.id}`)}
                 style={{
                   marginTop: 6,
                   backgroundColor: "#2e7d32",
@@ -98,7 +102,7 @@ export default function Explore() {
                 }}
               >
                 <Text style={{ color: "white", textAlign: "center" }}>
-                  Join
+                  View
                 </Text>
               </Pressable>
             </View>
