@@ -10,21 +10,22 @@ export default function Create() {
 
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
+  const [date, setDate] = useState("");
+  const [points, setPoints] = useState("10");
+  const [photoURL, setPhotoURL] = useState("");
 
-  // 🔒 BLOCK NON-VERIFIED USERS
   if (!loading && !profile?.verified) {
     return <Redirect href="/(tabs)/explore" />;
   }
 
   const handleCreate = async () => {
-    if (!title || !location) return;
-
     try {
       await createEvent({
         title,
         location,
-        pointsReward: 10,
-        photoURL: "",
+        date,
+        pointsReward: Number(points),
+        photoURL,
       });
 
       router.push("/(tabs)/explore");
@@ -50,6 +51,28 @@ export default function Create() {
         placeholder="Location"
         value={location}
         onChangeText={setLocation}
+        style={{ borderWidth: 1, padding: 10 }}
+      />
+
+      <TextInput
+        placeholder="Date (YYYY-MM-DDTHH:MM)"
+        value={date}
+        onChangeText={setDate}
+        style={{ borderWidth: 1, padding: 10 }}
+      />
+
+      <TextInput
+        placeholder="Points Reward"
+        value={points}
+        onChangeText={setPoints}
+        keyboardType="numeric"
+        style={{ borderWidth: 1, padding: 10 }}
+      />
+
+      <TextInput
+        placeholder="Photo URL"
+        value={photoURL}
+        onChangeText={setPhotoURL}
         style={{ borderWidth: 1, padding: 10 }}
       />
 
