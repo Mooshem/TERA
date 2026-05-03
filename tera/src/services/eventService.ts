@@ -7,10 +7,38 @@ import {
   updateDoc,
   query,
   where,
-  arrayUnion,
 } from "firebase/firestore";
 
 import { db, auth } from "../firebase";
+
+function resolveDisplayName(userData: any, firebaseUser: any) {
+  const raw = userData?.username;
+  if (typeof raw === "string" && raw.trim().length > 0) return raw.trim();
+
+  const email = firebaseUser?.email;
+  if (typeof email === "string" && email.includes("@")) {
+    return email.split("@")[0];
+  }
+
+  return null;
+}
+
+function sanitizeAttendees(attendees: any[] | undefined) {
+  const source = Array.isArray(attendees) ? attendees : [];
+  const seen = new Set<string>();
+
+  return source.filter((attendee) => {
+    const userId =
+      typeof attendee?.userId === "string" ? attendee.userId.trim() : "";
+    const username =
+      typeof attendee?.username === "string" ? attendee.username.trim() : "";
+
+    if (!userId || !username) return false;
+    if (seen.has(userId)) return false;
+    seen.add(userId);
+    return true;
+  });
+}
 
 /* =========================
    CREATE EVENT
@@ -41,6 +69,7 @@ export function listenToEvents(setEvents: (events: any[]) => void) {
       .map((doc) => ({
         id: doc.id,
         ...doc.data(),
+        attendees: sanitizeAttendees(doc.data().attendees),
       }))
       // hide completed events from explore
       .filter((e: any) => !e.completed);
@@ -66,6 +95,7 @@ export async function getEventById(eventId: string) {
   return {
     id: snap.id,
     ...snap.data(),
+    attendees: sanitizeAttendees(snap.data().attendees),
   };
 }
 
@@ -89,16 +119,30 @@ export async function joinEvent(eventId: string) {
   }
 
   const userData = userSnap.data();
+  const username = resolveDisplayName(userData, firebaseUser);
+
+  if (!username) {
+    console.log("Cannot join event: user has no valid display name");
+    return;
+  }
 
   const attendee = {
     userId: firebaseUser.uid,
-    username: userData.username,
+    username,
   };
 
   const eventRef = doc(db, "events", eventId);
+  const eventSnap = await getDoc(eventRef);
+  if (!eventSnap.exists()) return;
+
+  const existing = sanitizeAttendees(eventSnap.data().attendees);
+  const withoutCurrentUser = existing.filter(
+    (item: any) => item.userId !== firebaseUser.uid
+  );
+  const nextAttendees = [...withoutCurrentUser, attendee];
 
   await updateDoc(eventRef, {
-    attendees: arrayUnion(attendee),
+    attendees: nextAttendees,
   });
 }
 
@@ -115,6 +159,7 @@ export function listenToManagedEvents(
     const data = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      attendees: sanitizeAttendees(doc.data().attendees),
     }));
 
     setEvents(data);

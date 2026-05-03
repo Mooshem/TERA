@@ -5,11 +5,14 @@ import {
   FlatList,
   Image,
   TextInput,
-  Pressable,
 } from "react-native";
 import { router } from "expo-router";
 
 import { listenToEvents } from "../../src/services/eventService";
+import { AppCard } from "@/src/ui/components/AppCard";
+import { AppButton } from "@/src/ui/components/AppButton";
+import { ui } from "@/src/ui/theme";
+import { StyleSheet } from "react-native";
 
 export default function Explore() {
   const [events, setEvents] = useState<any[]>([]);
@@ -27,88 +30,146 @@ export default function Explore() {
   );
 
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      {/* SEARCH */}
+    <View style={styles.container}>
+      <Text style={styles.header}>Discover Community Cleanups</Text>
+      <Text style={styles.subheader}>Find events, earn points, and restore your local environment.</Text>
+
       <TextInput
-        placeholder="Search by username..."
+        placeholder="Search by organizer..."
         value={search}
         onChangeText={setSearch}
-        style={{
-          borderWidth: 1,
-          padding: 10,
-          borderRadius: 10,
-          marginBottom: 10,
-        }}
+        placeholderTextColor={ui.colors.textMuted}
+        style={styles.search}
       />
 
-      {/* GRID */}
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        columnWrapperStyle={{ gap: 10 }}
+        columnWrapperStyle={styles.columns}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <AppCard>
+            <Text style={styles.emptyTitle}>No events found</Text>
+            <Text style={styles.emptyBody}>Try another organizer name or check back soon.</Text>
+          </AppCard>
+        }
         renderItem={({ item }) => (
-          <View
-            style={{
-              flex: 1,
-              borderWidth: 1,
-              borderRadius: 10,
-              overflow: "hidden",
-              marginBottom: 10,
-            }}
-          >
-            {/* IMAGE */}
+          <AppCard style={styles.gridCard}>
             {item.photoURL ? (
               <Image
                 source={{ uri: item.photoURL }}
-                style={{ height: 120, width: "100%" }}
+                style={styles.image}
               />
             ) : (
-              <View
-                style={{
-                  height: 120,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#eee",
-                }}
-              >
-                <Text>No Image</Text>
+              <View style={styles.placeholder}>
+                <Text style={styles.placeholderText}>No image</Text>
               </View>
             )}
 
-            {/* CONTENT */}
-            <View style={{ padding: 8, gap: 4 }}>
-              <Text style={{ fontWeight: "bold" }}>
-                {item.title}
+            <View style={styles.content}>
+              <Text style={styles.title} numberOfLines={2}>
+                {item.title || "Cleanup Event"}
               </Text>
 
-              <Text>📍 {item.location}</Text>
-              <Text>🌱 {item.pointsReward} pts</Text>
-              <Text>👤 {item.createdByUsername}</Text>
-
-              {/* RSVP COUNT */}
-              <Text>
-                👥 {item.attendees?.length || 0} going
+              <Text style={styles.meta} numberOfLines={1}>
+                {item.location || "Unknown location"}
+              </Text>
+              <Text style={styles.meta}>
+                🌱 {item.pointsReward || 0} pts • 👥 {item.attendees?.length || 0} going
+              </Text>
+              <Text style={styles.byline} numberOfLines={1}>
+                by {item.createdByUsername || "Unknown"}
               </Text>
 
-              {/* NAVIGATE TO DETAIL */}
-              <Pressable
+              <AppButton
+                label="View"
                 onPress={() => router.push(`/event/${item.id}`)}
-                style={{
-                  marginTop: 6,
-                  backgroundColor: "#2e7d32",
-                  padding: 6,
-                  borderRadius: 6,
-                }}
-              >
-                <Text style={{ color: "white", textAlign: "center" }}>
-                  View
-                </Text>
-              </Pressable>
+                variant="secondary"
+              />
             </View>
-          </View>
+          </AppCard>
         )}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: ui.spacing.md,
+    backgroundColor: ui.colors.background,
+  },
+  search: {
+    borderWidth: 1,
+    borderColor: ui.colors.border,
+    borderRadius: ui.radius.md,
+    paddingHorizontal: ui.spacing.md,
+    paddingVertical: ui.spacing.sm,
+    backgroundColor: ui.colors.surface,
+    marginBottom: ui.spacing.md,
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: ui.colors.text,
+    marginBottom: 2,
+  },
+  subheader: {
+    color: ui.colors.textMuted,
+    marginBottom: ui.spacing.md,
+  },
+  columns: {
+    gap: ui.spacing.md,
+  },
+  listContent: {
+    gap: ui.spacing.md,
+    paddingBottom: ui.spacing.xxl,
+  },
+  gridCard: {
+    flex: 1,
+    padding: 0,
+    overflow: "hidden",
+  },
+  image: {
+    height: 120,
+    width: "100%",
+  },
+  placeholder: {
+    height: 120,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e9efe9",
+  },
+  placeholderText: {
+    color: ui.colors.textMuted,
+  },
+  content: {
+    padding: ui.spacing.sm,
+    gap: ui.spacing.xs,
+  },
+  title: {
+    fontWeight: "700",
+    color: ui.colors.primaryDark,
+    minHeight: 36,
+  },
+  meta: {
+    color: ui.colors.textMuted,
+    fontSize: 12,
+  },
+  byline: {
+    color: ui.colors.primaryDark,
+    fontSize: 12,
+    marginBottom: ui.spacing.sm,
+  },
+  emptyTitle: {
+    fontWeight: "700",
+    color: ui.colors.text,
+    fontSize: ui.type.section,
+  },
+  emptyBody: {
+    color: ui.colors.textMuted,
+    marginTop: ui.spacing.xs,
+  },
+});

@@ -7,7 +7,9 @@ import {
   } from "react-native";
   
   import { useEffect, useState } from "react";
-  import { useRouter } from "expo-router";
+  import { Href, useRouter } from "expo-router";
+  import { AppCard } from "@/src/ui/components/AppCard";
+  import { ui } from "@/src/ui/theme";
   
   import { useUserProfile } from "../../src/hooks/useUserProfile";
   import { calculateLevel, levelProgress } from "../../src/utils/levelSystem";
@@ -100,6 +102,7 @@ import {
       <ScrollView contentContainerStyle={styles.container}>
         {/* HEADER */}
         <View style={styles.header}>
+          <Text style={styles.kicker}>TERA PROFILE</Text>
           <Text style={styles.username}>{profile.username}</Text>
   
           {/* BADGES */}
@@ -116,12 +119,12 @@ import {
           </View>
   
           <Text style={styles.level}>
-            Level {level} {isVerified ? "🟢 Verified" : "⚪"}
+            Level {level} {isVerified ? "• Verified Organizer" : "• Community Member"}
           </Text>
         </View>
   
         {/* PROGRESS */}
-        <View style={styles.card}>
+        <AppCard style={styles.card}>
           <Text style={styles.cardTitle}>Progress</Text>
   
           <View style={styles.barBg}>
@@ -129,10 +132,10 @@ import {
           </View>
   
           <Text style={styles.points}>🌱 {points} pts</Text>
-        </View>
+        </AppCard>
   
         {/* DAILY TASKS */}
-        <View style={styles.card}>
+        <AppCard style={styles.card}>
           <Text style={styles.cardTitle}>Daily Tasks</Text>
           <Text style={styles.timer}>⏳ Refresh in {timeLeft}</Text>
   
@@ -155,27 +158,27 @@ import {
               </View>
             ))
           )}
-        </View>
+        </AppCard>
   
         {/* CREATOR TOOLS */}
         {isVerified && (
-          <View style={styles.card}>
+          <AppCard style={styles.card}>
             <Text style={styles.cardTitle}>Creator Tools</Text>
   
             <TouchableOpacity
               style={styles.createButton}
-              onPress={() => router.push("/create")}
+              onPress={() => router.push("/create" as Href)}
             >
               <Text style={styles.createButtonText}>
                 🌍 Create Cleanup Event
               </Text>
             </TouchableOpacity>
-          </View>
+          </AppCard>
         )}
   
         {/* MANAGED EVENTS */}
         {isVerified && (
-          <View style={styles.card}>
+          <AppCard style={styles.card}>
             <Text style={styles.cardTitle}>Managed Events</Text>
   
             {managedEvents.length === 0 ? (
@@ -233,22 +236,23 @@ import {
                 </View>
               ))
             )}
-          </View>
+          </AppCard>
         )}
       </ScrollView>
     );
   }
   
   /* COLORS */
-  const GREEN = "#2e7d32";
-  const LIGHT_GREEN = "#e8f5e9";
+  const GREEN = ui.colors.primary;
+  const LIGHT_GREEN = ui.colors.primarySoft;
   
   /* STYLES */
   const styles = StyleSheet.create({
     container: {
       padding: 20,
-      backgroundColor: "#f4f7f4",
+      backgroundColor: ui.colors.background,
       gap: 16,
+      paddingBottom: 40,
     },
   
     center: {
@@ -264,15 +268,23 @@ import {
     header: {
       marginBottom: 10,
     },
+    kicker: {
+      color: ui.colors.primaryDark,
+      fontSize: 11,
+      letterSpacing: 1,
+      fontWeight: "700",
+      marginBottom: 4,
+    },
   
     username: {
       fontSize: 28,
       fontWeight: "bold",
-      color: GREEN,
+      color: ui.colors.text,
     },
   
     level: {
-      color: "#555",
+      color: ui.colors.textMuted,
+      marginTop: 6,
     },
   
     badgeRow: {
@@ -287,6 +299,8 @@ import {
       paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 12,
+      borderWidth: 1,
+      borderColor: "#cfe5d0",
     },
   
     badgeText: {
@@ -297,14 +311,11 @@ import {
   
     noBadges: {
       fontSize: 12,
-      color: "#888",
+      color: ui.colors.textMuted,
     },
   
     card: {
-      backgroundColor: "white",
-      borderRadius: 12,
-      padding: 16,
-      elevation: 2,
+      gap: 6,
     },
   
     cardTitle: {
@@ -316,7 +327,7 @@ import {
   
     barBg: {
       height: 12,
-      backgroundColor: "#ddd",
+      backgroundColor: "#d9e4da",
       borderRadius: 6,
       overflow: "hidden",
     },
@@ -328,11 +339,12 @@ import {
   
     points: {
       marginTop: 8,
+      color: ui.colors.textMuted,
     },
   
     timer: {
       fontSize: 12,
-      color: "#666",
+      color: ui.colors.textMuted,
       marginBottom: 10,
     },
   
@@ -341,21 +353,24 @@ import {
       justifyContent: "space-between",
       marginBottom: 10,
       alignItems: "center",
+      paddingVertical: 4,
     },
   
     taskText: {
       fontSize: 14,
+      color: ui.colors.text,
     },
   
     taskPoints: {
       fontSize: 12,
-      color: "#777",
+      color: ui.colors.textMuted,
     },
   
     checkButton: {
       backgroundColor: GREEN,
       borderRadius: 20,
-      padding: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
     },
   
     checkText: {
@@ -364,7 +379,7 @@ import {
     },
   
     empty: {
-      color: "#777",
+      color: ui.colors.textMuted,
     },
   
     createButton: {
@@ -382,14 +397,17 @@ import {
   
     eventCard: {
       marginTop: 10,
-      padding: 12,
+      padding: 14,
       backgroundColor: LIGHT_GREEN,
       borderRadius: 10,
+      borderWidth: 1,
+      borderColor: "#cfe5d0",
     },
   
     eventTitle: {
       fontWeight: "bold",
       fontSize: 16,
+      color: ui.colors.primaryDark,
     },
   
     eventMeta: {
@@ -401,7 +419,7 @@ import {
     attendeeRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: 6,
+      marginBottom: 10,
       alignItems: "center",
     },
   
@@ -411,20 +429,20 @@ import {
   
     buttonGroup: {
       flexDirection: "row",
-      gap: 6,
+      gap: 8,
     },
   
     fullButton: {
       backgroundColor: GREEN,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
       borderRadius: 6,
     },
   
     halfButton: {
-      backgroundColor: "#66bb6a",
-      paddingHorizontal: 8,
-      paddingVertical: 4,
+      backgroundColor: "#6cae70",
+      paddingHorizontal: 10,
+      paddingVertical: 6,
       borderRadius: 6,
     },
   
@@ -435,8 +453,8 @@ import {
   
     completeButton: {
       marginTop: 10,
-      backgroundColor: "#1b5e20",
-      padding: 8,
+      backgroundColor: ui.colors.primaryDark,
+      paddingVertical: 10,
       borderRadius: 8,
       alignItems: "center",
     },
