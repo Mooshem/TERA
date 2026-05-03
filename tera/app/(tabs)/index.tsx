@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { AppCard } from "@/src/ui/components/AppCard";
@@ -31,66 +31,72 @@ export default function HomeScreen() {
   return (
     <View style={styles.screen}>
       <PixelNatureBackdrop />
-      <AppCard style={styles.hero}>
-        <Text style={styles.eyebrow}>TERA DAILY IMPACT</Text>
-        <Text style={styles.heroTitle}>Welcome back, {firstName}</Text>
-        <Text style={styles.heroBody}>
-          Every action counts. Keep your sustainability momentum alive today.
-        </Text>
-      </AppCard>
-
-      <View style={styles.statRow}>
-        <AppCard style={styles.statCard}>
-          <View style={styles.statIcon}>
-            <PixelIcon type="leaf" size={32} color="#7cb342" animated={true} />
-          </View>
-          <Text style={styles.statValue}>{points}</Text>
-          <Text style={styles.statLabel}>Total points</Text>
+      <ScrollView 
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <AppCard style={styles.hero}>
+          <Text style={styles.eyebrow}>TERA DAILY IMPACT</Text>
+          <Text style={styles.heroTitle}>Welcome back, {firstName}</Text>
+          <Text style={styles.heroBody}>
+            Every action counts. Keep your sustainability momentum alive today.
+          </Text>
         </AppCard>
-        <AppCard style={styles.statCard}>
-          <View style={styles.statIcon}>
-            🌿
+
+        <View style={styles.statRow}>
+          <AppCard style={styles.statCard}>
+            <View style={styles.statIcon}>
+              <PixelIcon type="leaf" size={32} color="#7cb342" animated={true} />
+            </View>
+            <Text style={styles.statValue}>{points}</Text>
+            <Text style={styles.statLabel}>Total points</Text>
+          </AppCard>
+          <AppCard style={styles.statCard}>
+            <View style={styles.statIcon}>
+              🌿
+            </View>
+            <Text style={styles.statValue}>{profile?.badges?.length || 0}</Text>
+            <Text style={styles.statLabel}>Badges earned</Text>
+          </AppCard>
+        </View>
+
+        <AppCard style={styles.section}>
+          <View style={styles.levelRow}>
+            <Text style={styles.levelText}>Level {level}</Text>
+            <View style={styles.streakChip}>
+            <PixelIcon type="fire" size={16} color="#ff6b35" />
+            <Text style={styles.streakText}> {streak} day streak</Text>
           </View>
-          <Text style={styles.statValue}>{profile?.badges?.length || 0}</Text>
-          <Text style={styles.statLabel}>Badges earned</Text>
+          </View>
+          <PixelProgressBar 
+            progress={progress} 
+            height={16}
+            color={ui.colors.primary}
+            backgroundColor={ui.colors.border}
+          />
+          <Text style={styles.progressText}>{Math.round(progress * 100)}% to next level</Text>
+
+          <Text style={styles.sectionTitle}>Today&apos;s Eco Mission</Text>
+          <Text style={styles.sectionBody}>
+            Join a local cleanup or complete one task to unlock your green bonus.
+          </Text>
+          <AppButton label="Explore Events" onPress={() => router.push("/(tabs)/explore")} />
+          <AppButton
+            label="View Leaderboard"
+            variant="secondary"
+            compact
+            onPress={() => router.push("/(tabs)/leaderboard")}
+          />
         </AppCard>
-      </View>
 
-      <AppCard style={styles.section}>
-        <View style={styles.levelRow}>
-          <Text style={styles.levelText}>Level {level}</Text>
-          <View style={styles.streakChip}>
-          <PixelIcon type="fire" size={16} color="#ff6b35" />
-          <Text style={styles.streakText}> {streak} day streak</Text>
-        </View>
-        </View>
-        <PixelProgressBar 
-          progress={progress} 
-          height={16}
-          color={ui.colors.primary}
-          backgroundColor={ui.colors.border}
-        />
-        <Text style={styles.progressText}>{Math.round(progress * 100)}% to next level</Text>
-
-        <Text style={styles.sectionTitle}>Today&apos;s Eco Mission</Text>
-        <Text style={styles.sectionBody}>
-          Join a local cleanup or complete one task to unlock your green bonus.
-        </Text>
-        <AppButton label="Explore Events" onPress={() => router.push("/(tabs)/explore")} />
-        <AppButton
-          label="View Leaderboard"
-          variant="secondary"
-          compact
-          onPress={() => router.push("/(tabs)/leaderboard")}
-        />
-      </AppCard>
-
-      <AppCard style={styles.section}>
-        <Text style={styles.sectionTitle}>TERA Tip of the day</Text>
-        <Text style={styles.sectionBody}>
-          Bring a reusable bottle and container. Two swaps can prevent hundreds of disposables.
-        </Text>
-      </AppCard>
+        <AppCard style={styles.section}>
+          <Text style={styles.sectionTitle}>TERA Tip of the day</Text>
+          <Text style={styles.sectionBody}>
+            Bring a reusable bottle and container. Two swaps can prevent hundreds of disposables.
+          </Text>
+        </AppCard>
+      </ScrollView>
     </View>
   );
 }
@@ -99,8 +105,14 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: ui.colors.background,
+  },
+  scroll: {
+    flex: 1,
+  },
+  content: {
     padding: ui.spacing.xl,
     gap: ui.spacing.md,
+    paddingBottom: ui.spacing.xxl,
   },
   hero: {
     backgroundColor: ui.colors.primarySoft,
