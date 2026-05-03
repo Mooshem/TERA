@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { ui } from "@/src/ui/theme";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { AppButton } from "@/src/ui/components/AppButton";
+import { BackNavButton } from "@/src/ui/components/BackNavButton";
 
 export default function Signup() {
   const router = useRouter();
@@ -60,6 +61,7 @@ export default function Signup() {
     <View style={styles.screen}>
       <View style={styles.orbLarge} />
       <View style={styles.orbSmall} />
+      <BackNavButton fallbackHref="/(auth)/login" label="Login" style={styles.backButton} />
 
       <View style={styles.brandWrap}>
         <Text style={styles.brand}>TERA</Text>
@@ -148,6 +150,9 @@ const styles = StyleSheet.create({
   brandWrap: {
     alignItems: "center",
     gap: 2,
+  },
+  backButton: {
+    marginBottom: ui.spacing.xs,
   },
   brand: {
     fontSize: 34,

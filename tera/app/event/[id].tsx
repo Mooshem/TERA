@@ -1,6 +1,7 @@
 import { View, Text, Image, Pressable, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { BackNavButton } from "@/src/ui/components/BackNavButton";
 
 import { getEventById, joinEvent } from "../../src/services/eventService";
 
@@ -23,6 +24,8 @@ export default function EventDetail() {
 
   return (
     <ScrollView style={{ flex: 1, padding: 16 }}>
+      <BackNavButton fallbackHref="/(tabs)/explore" />
+
       {/* IMAGE */}
       {event.photoURL && (
         <Image

@@ -8,6 +8,7 @@ type AppButtonProps = {
   onPress: () => void;
   variant?: Variant;
   disabled?: boolean;
+  compact?: boolean;
 };
 
 export function AppButton({
@@ -15,6 +16,7 @@ export function AppButton({
   onPress,
   variant = "primary",
   disabled = false,
+  compact = false,
 }: AppButtonProps) {
   return (
     <Pressable
@@ -22,6 +24,7 @@ export function AppButton({
       disabled={disabled}
       style={({ pressed }) => [
         styles.base,
+        compact && styles.compact,
         variant === "primary"
           ? styles.primary
           : variant === "secondary"
@@ -52,9 +55,17 @@ const styles = StyleSheet.create({
     borderRadius: ui.radius.sm,
     borderWidth: 1,
   },
+  compact: {
+    minHeight: 38,
+  },
   primary: {
     backgroundColor: ui.colors.primary,
     borderColor: ui.colors.primary,
+    shadowColor: ui.colors.primaryDark,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
   secondary: {
     backgroundColor: ui.colors.primarySoft,

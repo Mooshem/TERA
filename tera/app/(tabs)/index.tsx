@@ -1,15 +1,29 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { AppCard } from "@/src/ui/components/AppCard";
 import { AppButton } from "@/src/ui/components/AppButton";
 import { ui } from "@/src/ui/theme";
+import { calculateLevel, levelProgress } from "@/src/utils/levelSystem";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { profile } = useUserProfile();
   const points = profile?.points || 0;
   const firstName = profile?.username || "Friend";
+  const level = calculateLevel(points);
+  const progress = levelProgress(points);
+  const streak = profile?.streak?.current || 0;
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: Math.max(0.08, progress),
+      duration: 650,
+      useNativeDriver: false,
+    }).start();
+  }, [progress, progressAnim]);
 
   return (
     <View style={styles.screen}>
@@ -23,21 +37,46 @@ export default function HomeScreen() {
 
       <View style={styles.statRow}>
         <AppCard style={styles.statCard}>
-          <Text style={styles.statValue}>{points}</Text>
+          <Text style={styles.statValue}>🌱 {points}</Text>
           <Text style={styles.statLabel}>Total points</Text>
         </AppCard>
         <AppCard style={styles.statCard}>
-          <Text style={styles.statValue}>{profile?.badges?.length || 0}</Text>
+          <Text style={styles.statValue}>🏅 {profile?.badges?.length || 0}</Text>
           <Text style={styles.statLabel}>Badges earned</Text>
         </AppCard>
       </View>
 
       <AppCard style={styles.section}>
+        <View style={styles.levelRow}>
+          <Text style={styles.levelText}>Level {level}</Text>
+          <Text style={styles.streakChip}>🔥 {streak} day streak</Text>
+        </View>
+        <View style={styles.progressTrack}>
+          <Animated.View
+            style={[
+              styles.progressFill,
+              {
+                width: progressAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["0%", "100%"],
+                }),
+              },
+            ]}
+          />
+        </View>
+        <Text style={styles.progressText}>{Math.round(progress * 100)}% to next level</Text>
+
         <Text style={styles.sectionTitle}>Today&apos;s Eco Mission</Text>
         <Text style={styles.sectionBody}>
           Join a local cleanup or complete one task to unlock your green bonus.
         </Text>
         <AppButton label="Explore Events" onPress={() => router.push("/(tabs)/explore")} />
+        <AppButton
+          label="View Leaderboard"
+          variant="secondary"
+          compact
+          onPress={() => router.push("/(tabs)/leaderboard")}
+        />
       </AppCard>
 
       <AppCard style={styles.section}>
@@ -97,6 +136,40 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: ui.spacing.sm,
+  },
+  levelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  levelText: {
+    color: ui.colors.primaryDark,
+    fontWeight: "700",
+  },
+  streakChip: {
+    backgroundColor: "#fff2dc",
+    color: "#8a5a00",
+    paddingHorizontal: ui.spacing.sm,
+    paddingVertical: ui.spacing.xs,
+    borderRadius: ui.radius.pill,
+    borderWidth: 1,
+    borderColor: "#f3d59a",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  progressTrack: {
+    height: 10,
+    borderRadius: ui.radius.pill,
+    overflow: "hidden",
+    backgroundColor: "#d8e7d9",
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: ui.colors.primary,
+  },
+  progressText: {
+    color: ui.colors.textMuted,
+    fontSize: 12,
   },
   sectionTitle: {
     fontSize: ui.type.section,

@@ -4,6 +4,7 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
+    Animated,
   } from "react-native";
   
   import { useEffect, useState } from "react";
@@ -44,6 +45,10 @@ import {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [timeLeft, setTimeLeft] = useState("");
     const [managedEvents, setManagedEvents] = useState<any[]>([]);
+    const [rewardText, setRewardText] = useState("");
+    const chipPulse = useState(new Animated.Value(1))[0];
+    const rewardOpacity = useState(new Animated.Value(0))[0];
+    const rewardLift = useState(new Animated.Value(0))[0];
   
     const isVerified = profile?.verified === true;
   
@@ -85,6 +90,43 @@ import {
     const completeTask = (task: Task) => {
       setPoints((prev) => prev + task.points);
       setTasks((prev) => prev.filter((t) => t.id !== task.id));
+      setRewardText(`+${task.points} XP`);
+
+      rewardOpacity.setValue(0);
+      rewardLift.setValue(0);
+      Animated.sequence([
+        Animated.spring(chipPulse, {
+          toValue: 1.08,
+          useNativeDriver: true,
+          friction: 4,
+          tension: 100,
+        }),
+        Animated.spring(chipPulse, {
+          toValue: 1,
+          useNativeDriver: true,
+          friction: 5,
+          tension: 90,
+        }),
+      ]).start();
+
+      Animated.parallel([
+        Animated.timing(rewardOpacity, {
+          toValue: 1,
+          duration: 160,
+          useNativeDriver: true,
+        }),
+        Animated.timing(rewardLift, {
+          toValue: -8,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        Animated.timing(rewardOpacity, {
+          toValue: 0,
+          duration: 260,
+          useNativeDriver: true,
+        }).start(() => setRewardText(""));
+      });
     };
   
     if (!profile) {
@@ -104,6 +146,10 @@ import {
         <View style={styles.header}>
           <Text style={styles.kicker}>TERA PROFILE</Text>
           <Text style={styles.username}>{profile.username}</Text>
+          <Animated.View style={[styles.metaChips, { transform: [{ scale: chipPulse }] }]}>
+            <Text style={styles.metaChip}>🌱 {points} XP</Text>
+            <Text style={styles.metaChip}>🔥 {profile?.streak?.current || 0} streak</Text>
+          </Animated.View>
   
           {/* BADGES */}
           <View style={styles.badgeRow}>
@@ -138,6 +184,19 @@ import {
         <AppCard style={styles.card}>
           <Text style={styles.cardTitle}>Daily Tasks</Text>
           <Text style={styles.timer}>⏳ Refresh in {timeLeft}</Text>
+          {rewardText ? (
+            <Animated.Text
+              style={[
+                styles.rewardBurst,
+                {
+                  opacity: rewardOpacity,
+                  transform: [{ translateY: rewardLift }],
+                },
+              ]}
+            >
+              {rewardText}
+            </Animated.Text>
+          ) : null}
   
           {tasks.length === 0 ? (
             <Text style={styles.empty}>All tasks completed</Text>
@@ -293,6 +352,22 @@ import {
       gap: 6,
       marginTop: 6,
     },
+    metaChips: {
+      flexDirection: "row",
+      gap: 8,
+      marginTop: 8,
+    },
+    metaChip: {
+      backgroundColor: "#e6f5e9",
+      color: ui.colors.primaryDark,
+      borderRadius: ui.radius.pill,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      fontSize: 12,
+      borderWidth: 1,
+      borderColor: "#c7dccb",
+      fontWeight: "700",
+    },
   
     badge: {
       backgroundColor: LIGHT_GREEN,
@@ -346,6 +421,11 @@ import {
       fontSize: 12,
       color: ui.colors.textMuted,
       marginBottom: 10,
+    },
+    rewardBurst: {
+      color: ui.colors.primaryDark,
+      fontWeight: "800",
+      marginBottom: 6,
     },
   
     taskRow: {

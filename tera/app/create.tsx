@@ -1,6 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { useState } from "react";
 import { useRouter, Redirect } from "expo-router";
+import { BackNavButton } from "@/src/ui/components/BackNavButton";
 
 import { useUserProfile } from "../src/hooks/useUserProfile";
 import { createEvent } from "../src/services/eventService";
@@ -44,6 +45,7 @@ export default function Create() {
 
   return (
     <View style={styles.container}>
+      <BackNavButton fallbackHref="/(tabs)/profile" />
       <Text style={styles.header}>Create Event 🌍</Text>
 
       <TextInput
