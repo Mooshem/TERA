@@ -1,7 +1,14 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { useUserProfile } from "../../src/hooks/useUserProfile";
 import { calculateLevel, levelProgress } from "../../src/utils/levelSystem";
 import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 
 type Task = {
   id: string;
@@ -19,23 +26,26 @@ const TASK_POOL: Task[] = [
 
 export default function Profile() {
   const { profile } = useUserProfile();
+  const router = useRouter();
 
   const [points, setPoints] = useState(0);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [timeLeft, setTimeLeft] = useState("");
 
-  // Initialize profile points
+  const isVerified = profile?.verified === true;
+
+  // Load points from profile
   useEffect(() => {
     if (profile) setPoints(profile.points || 0);
   }, [profile]);
 
-  // Generate 3 daily tasks
+  // Daily tasks
   useEffect(() => {
     const shuffled = [...TASK_POOL].sort(() => 0.5 - Math.random());
     setTasks(shuffled.slice(0, 3));
   }, []);
 
-  // Countdown to midnight
+  // Countdown timer
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -75,7 +85,9 @@ export default function Profile() {
       {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.username}>{profile.username}</Text>
-        <Text style={styles.level}>Level {level}</Text>
+        <Text style={styles.level}>
+          Level {level} {isVerified ? "🟢 Verified" : "⚪"}
+        </Text>
       </View>
 
       {/* PROGRESS */}
@@ -144,6 +156,22 @@ export default function Profile() {
           )}
         </View>
       </View>
+
+      {/* 🌍 CREATE EVENT BUTTON */}
+      {isVerified && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Creator Tools</Text>
+
+          <TouchableOpacity
+            style={styles.createButton}
+            onPress={() => router.push("/create")}
+          >
+            <Text style={styles.createButtonText}>
+              🌍 Create Cleanup Event
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -270,5 +298,18 @@ const styles = StyleSheet.create({
 
   empty: {
     color: "#777",
+  },
+
+  createButton: {
+    backgroundColor: GREEN,
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
+  },
+
+  createButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
