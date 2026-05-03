@@ -6,8 +6,13 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
+import { useUserProfile } from "../../src/hooks/useUserProfile";
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { profile } = useUserProfile();
+
+  const isVerified = profile?.verified;
 
   return (
     <Tabs
@@ -37,7 +42,19 @@ export default function TabLayout() {
         }}
       />
 
-      {/* 🏆 NEW LEADERBOARD TAB */}
+      {/* 🔒 ONLY VERIFIED USERS SEE THIS */}
+      {isVerified && (
+        <Tabs.Screen
+          name="create"
+          options={{
+            title: "Create",
+            tabBarIcon: ({ color }) => (
+              <IconSymbol size={28} name="plus.circle.fill" color={color} />
+            ),
+          }}
+        />
+      )}
+
       <Tabs.Screen
         name="leaderboard"
         options={{

@@ -1,112 +1,110 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  TextInput,
+  Pressable,
+} from "react-native";
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import { listenToEvents, joinEvent } from "../../src/services/eventService";
 
-export default function TabTwoScreen() {
+export default function Explore() {
+  const [events, setEvents] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const unsub = listenToEvents(setEvents);
+    return unsub;
+  }, []);
+
+  const filtered = events.filter((e) =>
+    (e.createdByUsername || "")
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View style={{ flex: 1, padding: 10 }}>
+      {/* SEARCH */}
+      <TextInput
+        placeholder="Search by username..."
+        value={search}
+        onChangeText={setSearch}
+        style={{
+          borderWidth: 1,
+          padding: 10,
+          borderRadius: 10,
+          marginBottom: 10,
+        }}
+      />
+
+      {/* GRID */}
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={{ gap: 10 }}
+        renderItem={({ item }) => (
+          <View
+            style={{
+              flex: 1,
+              borderWidth: 1,
+              borderRadius: 10,
+              overflow: "hidden",
+              marginBottom: 10,
+            }}
+          >
+            {/* IMAGE */}
+            {item.photoURL ? (
+              <Image
+                source={{ uri: item.photoURL }}
+                style={{ height: 120, width: "100%" }}
+              />
+            ) : (
+              <View
+                style={{
+                  height: 120,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "#eee",
+                }}
+              >
+                <Text>No Image</Text>
+              </View>
+            )}
+
+            {/* CONTENT */}
+            <View style={{ padding: 8, gap: 4 }}>
+              <Text style={{ fontWeight: "bold" }}>
+                {item.title}
+              </Text>
+
+              <Text>📍 {item.location}</Text>
+
+              <Text>🌱 {item.pointsReward} pts</Text>
+
+              <Text>👤 {item.createdByUsername}</Text>
+
+              {/* JOIN BUTTON */}
+              <Pressable
+                onPress={() => joinEvent(item.id)}
+                style={{
+                  marginTop: 6,
+                  backgroundColor: "#2e7d32",
+                  padding: 6,
+                  borderRadius: 6,
+                }}
+              >
+                <Text style={{ color: "white", textAlign: "center" }}>
+                  Join
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+      />
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});

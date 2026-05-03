@@ -40,7 +40,7 @@ export default function Signup() {
         email: email.trim(),
         points: 0,
         badges: [],
-        createdAt: serverTimestamp(),
+        verified: false,
       });
 
       // 3. Go into app
