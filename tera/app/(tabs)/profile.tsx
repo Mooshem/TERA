@@ -1,9 +1,63 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useUserProfile } from "../../src/hooks/useUserProfile";
 import { calculateLevel, levelProgress } from "../../src/utils/levelSystem";
+import { useEffect, useState } from "react";
+
+type Task = {
+  id: string;
+  title: string;
+  points: number;
+};
+
+const TASK_POOL: Task[] = [
+  { id: "1", title: "Pick up 5 pieces of trash", points: 10 },
+  { id: "2", title: "Recycle 3 items", points: 8 },
+  { id: "3", title: "Clean a small outdoor area", points: 15 },
+  { id: "4", title: "Use reusable container today", points: 5 },
+  { id: "5", title: "Join a cleanup event", points: 20 },
+];
 
 export default function Profile() {
   const { profile } = useUserProfile();
+
+  const [points, setPoints] = useState(0);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [timeLeft, setTimeLeft] = useState("");
+
+  // Initialize profile points
+  useEffect(() => {
+    if (profile) setPoints(profile.points || 0);
+  }, [profile]);
+
+  // Generate 3 daily tasks
+  useEffect(() => {
+    const shuffled = [...TASK_POOL].sort(() => 0.5 - Math.random());
+    setTasks(shuffled.slice(0, 3));
+  }, []);
+
+  // Countdown to midnight
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+
+      const diff = midnight.getTime() - now.getTime();
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const completeTask = (task: Task) => {
+    setPoints((prev) => prev + task.points);
+    setTasks((prev) => prev.filter((t) => t.id !== task.id));
+  };
 
   if (!profile) {
     return (
@@ -13,8 +67,8 @@ export default function Profile() {
     );
   }
 
-  const level = calculateLevel(profile.points || 0);
-  const progress = levelProgress(profile.points || 0);
+  const level = calculateLevel(points);
+  const progress = levelProgress(points);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -24,7 +78,7 @@ export default function Profile() {
         <Text style={styles.level}>Level {level}</Text>
       </View>
 
-      {/* PROGRESS CARD */}
+      {/* PROGRESS */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Progress</Text>
 
@@ -37,13 +91,41 @@ export default function Profile() {
           />
         </View>
 
-        <Text style={styles.points}>🌱 {profile.points} points</Text>
+        <Text style={styles.points}>🌱 {points} points</Text>
       </View>
 
-      {/* STATS CARD */}
+      {/* DAILY TASKS */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Daily Tasks</Text>
+        <Text style={styles.timer}>⏳ Refresh in {timeLeft}</Text>
+
+        {tasks.length === 0 ? (
+          <Text style={styles.empty}>All tasks completed today</Text>
+        ) : (
+          tasks.map((task) => (
+            <View key={task.id} style={styles.taskRow}>
+              <View>
+                <Text style={styles.taskText}>{task.title}</Text>
+                <Text style={styles.taskPoints}>+{task.points} pts</Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.checkButton}
+                onPress={() => completeTask(task)}
+              >
+                <Text style={styles.checkText}>✔</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
+      </View>
+
+      {/* STATS */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Stats</Text>
-        <Text style={styles.stat}>🔥 Streak: {profile.streak?.current || 0} days</Text>
+        <Text style={styles.stat}>
+          🔥 Streak: {profile.streak?.current || 0} days
+        </Text>
       </View>
 
       {/* BADGES */}
@@ -54,7 +136,7 @@ export default function Profile() {
           {(profile.badges || []).length === 0 ? (
             <Text style={styles.empty}>No badges yet</Text>
           ) : (
-            (profile.badges || []).map((b: string) => (
+            profile.badges.map((b: string) => (
               <View key={b} style={styles.badge}>
                 <Text style={styles.badgeText}>🏅 {b}</Text>
               </View>
@@ -106,9 +188,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
     elevation: 2,
   },
 
@@ -133,13 +212,43 @@ const styles = StyleSheet.create({
 
   points: {
     marginTop: 8,
+  },
+
+  timer: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 10,
+  },
+
+  taskRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  taskText: {
     fontSize: 14,
-    color: "#333",
+  },
+
+  taskPoints: {
+    fontSize: 12,
+    color: "#777",
+  },
+
+  checkButton: {
+    backgroundColor: GREEN,
+    borderRadius: 20,
+    padding: 8,
+  },
+
+  checkText: {
+    color: "white",
+    fontWeight: "bold",
   },
 
   stat: {
     fontSize: 16,
-    color: "#333",
   },
 
   badgeContainer: {
@@ -157,7 +266,6 @@ const styles = StyleSheet.create({
 
   badgeText: {
     color: GREEN,
-    fontWeight: "500",
   },
 
   empty: {
