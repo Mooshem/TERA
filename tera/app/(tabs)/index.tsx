@@ -49,7 +49,7 @@ export default function HomeScreen() {
         </AppCard>
         <AppCard style={styles.statCard}>
           <View style={styles.statIcon}>
-            <PixelIcon type="badge" size={32} color="#daa520" />
+            🌿
           </View>
           <Text style={styles.statValue}>{profile?.badges?.length || 0}</Text>
           <Text style={styles.statLabel}>Badges earned</Text>

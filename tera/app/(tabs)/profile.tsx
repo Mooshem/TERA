@@ -159,8 +159,7 @@ export default function Profile() {
               profile.badges.map((b: string) => (
                 <View key={b} style={styles.badge}>
                   <View style={styles.badgeContent}>
-                    <PixelIcon type="badge" size={12} color="#daa520" />
-                    <Text style={styles.badgeText}> {b}</Text>
+                    🌿 {b}
                   </View>
                 </View>
               ))
@@ -460,32 +459,45 @@ const styles = StyleSheet.create({
   },
   fullButton: {
     backgroundColor: GREEN,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: "#2d5a3d",
+    alignItems: "center",
+    justifyContent: "center",
   },
   fullButtonPressed: {
-    backgroundColor: "#2d5a3d",
+    backgroundColor: "#1a4a2e",
+    borderColor: "#163a20",
     transform: [{ scale: 0.95 }],
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
   },
   halfButton: {
     backgroundColor: "#6cae70",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: "#5a8d5f",
+    alignItems: "center",
+    justifyContent: "center",
   },
   halfButtonPressed: {
-    backgroundColor: "#5a8d5f",
+    backgroundColor: "#4a8d5f",
+    borderColor: "#2d5a3d",
     transform: [{ scale: 0.95 }],
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
   },
   buttonText: {
     color: "white",
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "700",
+    textAlign: "center",
   },
   completeButton: {
     marginTop: 10,
